@@ -1,3 +1,4 @@
+import Link from "next/link";
 
 const steps = [
   {
@@ -40,6 +41,7 @@ function ShareDiagram() {
             Illustrative · 3 of 5 required
           </p>
         </div>
+
         <span className="font-mono text-[10px] tracking-[0.12em] text-[#77766D]">
           FIG. 01
         </span>
@@ -62,6 +64,7 @@ function ShareDiagram() {
           {shares.map((share, index) => (
             <div key={share.id} className="flex flex-col items-center">
               <div className="h-5 w-px bg-[#252522]/40" />
+
               <div
                 className="flex h-9 w-9 items-center justify-center border border-[#252522]/10 font-mono text-xs"
                 style={{
@@ -107,14 +110,18 @@ export default function Home() {
     <main className="min-h-screen bg-[#F3F0E6] text-[#252522]">
       <header className="border-b border-[#252522]/20">
         <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-10">
-          <a href="/" className="shrink-0 text-xl font-bold tracking-tight">
+          <Link
+            href="/"
+            className="shrink-0 text-xl font-bold tracking-tight"
+          >
             secret<span className="text-[#702632]">/</span>share
-          </a>
+          </Link>
 
           <div className="hidden items-center gap-8 text-xs uppercase tracking-[0.16em] text-[#55554D] sm:flex">
             <a href="#method" className="transition hover:text-[#702632]">
               Method
             </a>
+
             <a href="#about" className="transition hover:text-[#702632]">
               About
             </a>
@@ -153,7 +160,10 @@ export default function Home() {
             >
               Explore the method <span className="ml-3">↗</span>
             </a>
-            <span className="text-xs text-[#77766D]">No account required</span>
+
+            <span className="text-xs text-[#77766D]">
+              No account required
+            </span>
           </div>
 
           <div className="mt-12 grid w-full max-w-lg grid-cols-3 border-y border-[#252522]/20 py-5 sm:mt-14">
@@ -163,12 +173,14 @@ export default function Home() {
                 Threshold
               </p>
             </div>
+
             <div className="border-l border-[#252522]/20 pl-3 sm:pl-5">
               <p className="font-serif text-2xl sm:text-3xl">GF(p)</p>
               <p className="mt-1 text-[9px] uppercase tracking-[0.1em] text-[#77766D] sm:text-[10px] sm:tracking-[0.12em]">
                 Finite field
               </p>
             </div>
+
             <div className="border-l border-[#252522]/20 pl-3 sm:pl-5">
               <p className="font-serif text-2xl sm:text-3xl">0×01</p>
               <p className="mt-1 text-[9px] uppercase tracking-[0.1em] text-[#77766D] sm:text-[10px] sm:tracking-[0.12em]">
@@ -190,10 +202,12 @@ export default function Home() {
               <p className="text-xs uppercase tracking-[0.2em] text-[#702632]">
                 The process
               </p>
+
               <h2 className="mt-3 font-serif text-3xl tracking-tight sm:text-4xl">
                 Three steps. One threshold.
               </h2>
             </div>
+
             <p className="max-w-sm text-sm leading-6 text-[#626158]">
               Built to make the mathematics easier to understand, not hide it
               behind a button.
@@ -209,7 +223,9 @@ export default function Home() {
                 <p className="font-mono text-xs text-[#702632]">
                   / {step.number}
                 </p>
+
                 <h3 className="mt-8 text-lg font-semibold">{step.title}</h3>
+
                 <p className="mt-3 text-sm leading-6 text-[#626158]">
                   {step.description}
                 </p>
@@ -225,10 +241,12 @@ export default function Home() {
             <p className="text-lg font-semibold">
               secret<span className="text-[#A8B56A]">/</span>share
             </p>
+
             <p className="mt-1 text-sm text-[#B9B7AC]">
               An educational cryptography project.
             </p>
           </div>
+
           <p className="max-w-md text-xs leading-5 text-[#B9B7AC]">
             Under development. This interface is a prototype; do not use it to
             protect production secrets until the implementation has been
@@ -239,4 +257,3 @@ export default function Home() {
     </main>
   );
 }
-
