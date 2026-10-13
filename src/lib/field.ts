@@ -1,4 +1,3 @@
-
 export const PRIME = 257n;
 
 export function mod(value: bigint): bigint {
@@ -45,7 +44,19 @@ export function inverse(value: bigint): bigint {
     throw new RangeError("Cannot invert zero");
   }
 
-  return power(n, PRIME - 2n);
+  let oldR = n;
+  let r = PRIME;
+  let oldS = 1n;
+  let s = 0n;
+
+  while (r !== 0n) {
+    const quotient = oldR / r;
+
+    [oldR, r] = [r, oldR - quotient * r];
+    [oldS, s] = [s, oldS - quotient * s];
+  }
+
+  return mod(oldS);
 }
 
 export function divide(a: bigint, b: bigint): bigint {
