@@ -75,8 +75,7 @@ export default function RecoverPage() {
     }
 
     try {
-      const recovered = reconstructSecret(parsed, required);
-      setResult(recovered);
+      setResult(reconstructSecret(parsed, required));
     } catch {
       setError("Could not recover the secret. Check the shares and try again.");
     }
@@ -88,9 +87,15 @@ export default function RecoverPage() {
         <Link href="/" className="text-xl font-semibold tracking-tight">
           secret<span className="text-[#702632]">/</span>share
         </Link>
-        <Link href="/split" className="text-sm underline underline-offset-4">
-          Split a secret
-        </Link>
+
+        <div className="flex gap-5 text-sm">
+          <Link href="/split" className="underline underline-offset-4">
+            Split a secret
+          </Link>
+          <Link href="/recover" className="underline underline-offset-4">
+            Recover a secret
+          </Link>
+        </div>
       </nav>
 
       <section className="mx-auto max-w-3xl px-6 py-16 md:py-24">
