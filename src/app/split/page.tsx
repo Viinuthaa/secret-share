@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -10,10 +11,12 @@ export default function SplitPage() {
   const [threshold, setThreshold] = useState("3");
   const [shares, setShares] = useState<Share[]>([]);
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
 
   function generateShares() {
     setError("");
     setShares([]);
+    setCopied(false);
 
     try {
       if (!/^\d+$/.test(secret)) {
@@ -28,12 +31,44 @@ export default function SplitPage() {
       const count = Number(shareCount);
       const required = Number(threshold);
 
-      setShares(splitSecret(value, required, count));
+      const generated = splitSecret(value, required, count);
+      setShares(generated);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Could not generate shares.",
       );
     }
+  }
+
+  function downloadShares() {
+    if (shares.length === 0) return;
+
+    const content = [
+      "Secret Share - Generated Shares",
+      `Threshold: ${threshold}`,
+      `Total shares: ${shares.length}`,
+      `Secret range: 0-256`,
+      "",
+      "Keep these shares private.",
+      "",
+      ...shares.map(
+        (share, index) =>
+          `Share ${index + 1}: ${share.x.toString()},${share.y.toString()}`,
+      ),
+      "",
+      "Educational demo using GF(257). Not suitable for protecting real secrets.",
+    ].join("\n");
+
+    const file = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "secret-share.txt";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -44,12 +79,14 @@ export default function SplitPage() {
             secret<span className="text-[#702632]">/</span>share
           </Link>
 
-          <Link
-            href="/"
-            className="text-xs uppercase tracking-[0.16em] text-[#702632] hover:underline"
-          >
-            Back home
-          </Link>
+          <div className="flex gap-5 text-xs uppercase tracking-[0.16em] text-[#702632]">
+            <Link href="/" className="hover:underline">
+              Home
+            </Link>
+            <Link href="/recover" className="hover:underline">
+              Recover
+            </Link>
+          </div>
         </nav>
       </header>
 
@@ -170,9 +207,17 @@ export default function SplitPage() {
               ))}
             </div>
 
+            <button
+              type="button"
+              onClick={downloadShares}
+              className="mt-6 border border-[#702632] px-6 py-3 text-sm text-[#702632] transition hover:bg-[#702632] hover:text-[#F3F0E6]"
+            >
+              Download shares (.txt) ↓
+            </button>
+
             <p className="mt-4 text-xs leading-5 text-[#626158]">
-              This is a learning demo using GF(257). These shares are not
-              suitable for protecting real secrets.
+              Keep downloaded shares private. This learning demo uses GF(257)
+              and is not suitable for protecting real secrets.
             </p>
           </section>
         )}
