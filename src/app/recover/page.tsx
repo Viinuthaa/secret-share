@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { reconstructSecret } from "@/lib/reconstruct";
 import type { Share } from "@/lib/shamir";
@@ -11,6 +11,8 @@ export default function RecoverPage() {
   const [shares, setShares] = useState(["", "", ""]);
   const [result, setResult] = useState<bigint | null>(null);
   const [error, setError] = useState("");
+  const [importMessage, setImportMessage] = useState("");
+  const fileInput = useRef<HTMLInputElement>(null);
 
   function updateShare(index: number, value: string) {
     setShares((current) =>
@@ -18,6 +20,7 @@ export default function RecoverPage() {
     );
     setResult(null);
     setError("");
+    setImportMessage("");
   }
 
   function addShare() {
@@ -28,6 +31,79 @@ export default function RecoverPage() {
     setShares((current) => current.filter((_, i) => i !== index));
     setResult(null);
     setError("");
+  }
+
+  async function importShares(file: File | undefined) {
+    setError("");
+    setImportMessage("");
+    setResult(null);
+
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith(".txt")) {
+      setError("Please select a .txt file.");
+      return;
+    }
+
+    if (file.size > 100_000) {
+      setError("The file is too large to import.");
+      return;
+    }
+
+    try {
+      const content = await file.text();
+      const thresholdMatch = content.match(/^Threshold:\s*(\d+)\s*$/im);
+      const shareMatches = [
+        ...content.matchAll(/^Share\s+\d+:\s*(\d+\s*,\s*\d+)\s*$/gim),
+      ];
+
+      if (!thresholdMatch || shareMatches.length === 0) {
+        throw new Error("This file does not contain a supported share export.");
+      }
+
+      const importedThreshold = Number(thresholdMatch[1]);
+      const importedShares = shareMatches.map((match) => match[1].replace(/\s+/g, ""));
+
+      if (
+        !Number.isInteger(importedThreshold) ||
+        importedThreshold < 2 ||
+        importedThreshold > 256
+      ) {
+        throw new Error("The file contains an invalid threshold.");
+      }
+
+      const coordinates = importedShares.map((share) => {
+        const [xText, yText] = share.split(",");
+        const x = BigInt(xText);
+        const y = BigInt(yText);
+
+        if (x < 1n || x > 256n || y < 0n || y > 256n) {
+          throw new Error("The file contains invalid share coordinates.");
+        }
+
+        return { x, y };
+      });
+
+      if (coordinates.length < importedThreshold) {
+        throw new Error("The file contains fewer shares than its threshold.");
+      }
+
+      if (new Set(coordinates.map((share) => share.x.toString())).size !== coordinates.length) {
+        throw new Error("The file contains duplicate share coordinates.");
+      }
+
+      setThreshold(String(importedThreshold));
+      setShares(importedShares);
+      setImportMessage(`${importedShares.length} shares imported successfully.`);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Could not import this file."
+      );
+    } finally {
+      if (fileInput.current) {
+        fileInput.current.value = "";
+      }
+    }
   }
 
   function recoverSecret() {
@@ -75,14 +151,7 @@ export default function RecoverPage() {
     }
 
     try {
-      const recovered = reconstructSecret(parsed, required);
-
-      if (recovered < 0n || recovered > 256n) {
-        setError("The recovered value is outside the valid secret range.");
-        return;
-      }
-
-      setResult(recovered);
+      setResult(reconstructSecret(parsed, required));
     } catch {
       setError("Could not recover the secret. Check the shares and try again.");
     }
@@ -115,11 +184,33 @@ export default function RecoverPage() {
         </h1>
 
         <p className="mt-6 max-w-xl text-base leading-7 text-[#28251F]/70">
-          Enter the shares you collected to reconstruct the original secret.
-          You need at least the threshold number of valid shares.
+          Import your saved share file or enter shares manually to reconstruct
+          the original secret.
         </p>
 
-        <div className="mt-12 border-t border-[#28251F]/20 pt-8">
+        <div className="mt-10 border border-[#252522]/20 bg-[#E9E5D9] p-6 sm:p-8">
+          <h2 className="font-serif text-2xl">Import saved shares</h2>
+          <p className="mt-2 text-sm leading-6 text-[#626158]">
+            Select a .txt file downloaded from the Split page.
+          </p>
+
+          <input
+            ref={fileInput}
+            type="file"
+            accept=".txt,text/plain"
+            aria-label="Import saved shares text file"
+            onChange={(event) => void importShares(event.target.files?.[0])}
+            className="mt-5 block w-full text-sm file:mr-4 file:border-0 file:bg-[#702632] file:px-4 file:py-3 file:text-[#F3F0E6] hover:file:bg-[#54202A]"
+          />
+
+          {importMessage && (
+            <p role="status" className="mt-4 text-sm text-green-800">
+              {importMessage}
+            </p>
+          )}
+        </div>
+
+        <div className="mt-10 border-t border-[#28251F]/20 pt-8">
           <label htmlFor="threshold" className="block text-sm font-medium">
             Required number of shares
           </label>
