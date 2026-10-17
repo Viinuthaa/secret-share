@@ -36,8 +36,8 @@ export default function RecoverPage() {
 
     const required = Number(threshold);
 
-    if (!Number.isInteger(required) || required < 2 || required > 256) {
-      setError("Threshold must be between 2 and 256.");
+    if (!threshold.trim() || !Number.isInteger(required) || required < 2 || required > 256) {
+      setError("Threshold must be an integer between 2 and 256.");
       return;
     }
 
@@ -54,7 +54,7 @@ export default function RecoverPage() {
       const match = share.match(/^(\d+)\s*,\s*(\d+)$/);
 
       if (!match) {
-        setError("Enter each share in x, y format.");
+        setError("Enter each share in x, y format, for example 1, 85.");
         return;
       }
 
@@ -75,7 +75,14 @@ export default function RecoverPage() {
     }
 
     try {
-      setResult(reconstructSecret(parsed, required));
+      const recovered = reconstructSecret(parsed, required);
+
+      if (recovered < 0n || recovered > 256n) {
+        setError("The recovered value is outside the valid secret range.");
+        return;
+      }
+
+      setResult(recovered);
     } catch {
       setError("Could not recover the secret. Check the shares and try again.");
     }
