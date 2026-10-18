@@ -9,6 +9,7 @@ import type { Share } from "@/lib/shamir";
 export default function RecoverPage() {
   const [threshold, setThreshold] = useState("3");
   const [shares, setShares] = useState(["", "", ""]);
+  const [selected, setSelected] = useState<number[]>([0, 1, 2]);
   const [result, setResult] = useState<bigint | null>(null);
   const [error, setError] = useState("");
   const [importMessage, setImportMessage] = useState("");
@@ -23,12 +24,29 @@ export default function RecoverPage() {
     setImportMessage("");
   }
 
+  function toggleShare(index: number) {
+    setSelected((current) =>
+      current.includes(index)
+        ? current.filter((item) => item !== index)
+        : [...current, index]
+    );
+    setResult(null);
+    setError("");
+  }
+
   function addShare() {
+    const index = shares.length;
     setShares((current) => [...current, ""]);
+    setSelected((current) => [...current, index]);
   }
 
   function removeShare(index: number) {
     setShares((current) => current.filter((_, i) => i !== index));
+    setSelected((current) =>
+      current
+        .filter((item) => item !== index)
+        .map((item) => (item > index ? item - 1 : item))
+    );
     setResult(null);
     setError("");
   }
@@ -62,7 +80,9 @@ export default function RecoverPage() {
       }
 
       const importedThreshold = Number(thresholdMatch[1]);
-      const importedShares = shareMatches.map((match) => match[1].replace(/\s+/g, ""));
+      const importedShares = shareMatches.map((match) =>
+        match[1].replace(/\s+/g, "")
+      );
 
       if (
         !Number.isInteger(importedThreshold) ||
@@ -88,21 +108,23 @@ export default function RecoverPage() {
         throw new Error("The file contains fewer shares than its threshold.");
       }
 
-      if (new Set(coordinates.map((share) => share.x.toString())).size !== coordinates.length) {
+      if (
+        new Set(coordinates.map((share) => share.x.toString())).size !==
+        coordinates.length
+      ) {
         throw new Error("The file contains duplicate share coordinates.");
       }
 
       setThreshold(String(importedThreshold));
       setShares(importedShares);
+      setSelected(importedShares.map((_, index) => index));
       setImportMessage(`${importedShares.length} shares imported successfully.`);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Could not import this file."
       );
     } finally {
-      if (fileInput.current) {
-        fileInput.current.value = "";
-      }
+      if (fileInput.current) fileInput.current.value = "";
     }
   }
 
@@ -112,25 +134,30 @@ export default function RecoverPage() {
 
     const required = Number(threshold);
 
-    if (!threshold.trim() || !Number.isInteger(required) || required < 2 || required > 256) {
+    if (
+      !threshold.trim() ||
+      !Number.isInteger(required) ||
+      required < 2 ||
+      required > 256
+    ) {
       setError("Threshold must be an integer between 2 and 256.");
       return;
     }
 
-    const entered = shares.map((share) => share.trim()).filter(Boolean);
+    const chosen = shares.filter((_, index) => selected.includes(index));
 
-    if (entered.length < required) {
-      setError(`Enter at least ${required} shares.`);
+    if (chosen.length < required) {
+      setError(`Select at least ${required} shares to recover the secret.`);
       return;
     }
 
     const parsed: Share[] = [];
 
-    for (const share of entered) {
-      const match = share.match(/^(\d+)\s*,\s*(\d+)$/);
+    for (const share of chosen) {
+      const match = share.trim().match(/^(\d+)\s*,\s*(\d+)$/);
 
       if (!match) {
-        setError("Enter each share in x, y format, for example 1, 85.");
+        setError("Each selected share must use x, y format.");
         return;
       }
 
@@ -143,7 +170,7 @@ export default function RecoverPage() {
       }
 
       if (parsed.some((item) => item.x === x)) {
-        setError("Each share must have a unique x-coordinate.");
+        setError("Selected shares must have unique x-coordinates.");
         return;
       }
 
@@ -153,7 +180,7 @@ export default function RecoverPage() {
     try {
       setResult(reconstructSecret(parsed, required));
     } catch {
-      setError("Could not recover the secret. Check the shares and try again.");
+      setError("Could not recover the secret. Check the selected shares.");
     }
   }
 
@@ -184,8 +211,8 @@ export default function RecoverPage() {
         </h1>
 
         <p className="mt-6 max-w-xl text-base leading-7 text-[#28251F]/70">
-          Import your saved share file or enter shares manually to reconstruct
-          the original secret.
+          Import saved shares or enter them manually. Select the shares you
+          want to use for reconstruction.
         </p>
 
         <div className="mt-10 border border-[#252522]/20 bg-[#E9E5D9] p-6 sm:p-8">
@@ -230,31 +257,44 @@ export default function RecoverPage() {
         </div>
 
         <div className="mt-10">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <h2 className="font-serif text-2xl">Your shares</h2>
             <span className="text-sm text-[#28251F]/60">
-              {shares.length} entries
+              {selected.length} of {shares.length} selected
             </span>
           </div>
 
           <div className="space-y-3">
             {shares.map((share, index) => (
-              <div key={index} className="flex items-center gap-3">
+              <div
+                key={index}
+                className="flex items-center gap-3 border border-[#28251F]/15 bg-white/30 px-4 py-3"
+              >
+                <input
+                  type="checkbox"
+                  aria-label={`Select share ${index + 1}`}
+                  checked={selected.includes(index)}
+                  onChange={() => toggleShare(index)}
+                  className="h-4 w-4 accent-[#702632]"
+                />
+
                 <span className="w-8 text-sm text-[#28251F]/50">
                   {String(index + 1).padStart(2, "0")}
                 </span>
+
                 <input
-                  aria-label={`Share ${index + 1}`}
+                  aria-label={`Share ${index + 1} coordinates`}
                   value={share}
                   onChange={(event) => updateShare(index, event.target.value)}
                   placeholder="Enter share as x, y"
-                  className="min-w-0 flex-1 border border-[#28251F]/25 bg-white/40 px-4 py-3 outline-none focus:border-[#702632]"
+                  className="min-w-0 flex-1 bg-transparent px-2 py-2 outline-none focus:border-b focus:border-[#702632]"
                 />
+
                 {shares.length > 2 && (
                   <button
                     type="button"
                     onClick={() => removeShare(index)}
-                    className="px-2 py-3 text-sm text-[#702632] hover:underline"
+                    className="text-xs text-[#702632] hover:underline"
                     aria-label={`Remove share ${index + 1}`}
                   >
                     Remove
@@ -297,7 +337,7 @@ export default function RecoverPage() {
             </p>
             <p className="mt-3 font-serif text-4xl">{result.toString()}</p>
             <p className="mt-3 text-sm text-[#28251F]/70">
-              Reconstruction completed using the entered shares.
+              Reconstruction completed using the selected shares.
             </p>
           </div>
         )}
