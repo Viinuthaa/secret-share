@@ -11,12 +11,10 @@ export default function SplitPage() {
   const [threshold, setThreshold] = useState("3");
   const [shares, setShares] = useState<Share[]>([]);
   const [error, setError] = useState("");
-  const [copied, setCopied] = useState(false);
 
   function generateShares() {
     setError("");
     setShares([]);
-    setCopied(false);
 
     try {
       if (!/^\d+$/.test(secret)) {
@@ -31,8 +29,7 @@ export default function SplitPage() {
       const count = Number(shareCount);
       const required = Number(threshold);
 
-      const generated = splitSecret(value, required, count);
-      setShares(generated);
+      setShares(splitSecret(value, required, count));
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Could not generate shares.",
@@ -47,7 +44,7 @@ export default function SplitPage() {
       "Secret Share - Generated Shares",
       `Threshold: ${threshold}`,
       `Total shares: ${shares.length}`,
-      `Secret range: 0-256`,
+      "Secret range: 0-256",
       "",
       "Keep these shares private.",
       "",
