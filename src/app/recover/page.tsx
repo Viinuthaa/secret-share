@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRef, useState } from "react";
@@ -5,6 +6,8 @@ import Link from "next/link";
 import { reconstructSecret } from "@/lib/reconstruct";
 import { parseShareFile } from "@/lib/share-file";
 import type { Share } from "@/lib/shamir";
+
+const MAX_SHARES = 256;
 
 export default function RecoverPage() {
   const [threshold, setThreshold] = useState("3");
@@ -32,12 +35,21 @@ export default function RecoverPage() {
     );
     setResult(null);
     setError("");
+    setImportMessage("");
   }
 
   function addShare() {
+    if (shares.length >= MAX_SHARES) {
+      setError(`You can add at most ${MAX_SHARES} shares.`);
+      return;
+    }
+
     const index = shares.length;
     setShares((current) => [...current, ""]);
     setSelected((current) => [...current, index]);
+    setResult(null);
+    setError("");
+    setImportMessage("");
   }
 
   function removeShare(index: number) {
@@ -49,6 +61,7 @@ export default function RecoverPage() {
     );
     setResult(null);
     setError("");
+    setImportMessage("");
   }
 
   async function importShares(file: File | undefined) {
@@ -71,6 +84,11 @@ export default function RecoverPage() {
     try {
       const content = await file.text();
       const imported = parseShareFile(content);
+
+      if (imported.shares.length > MAX_SHARES) {
+        throw new RangeError(`You can import at most ${MAX_SHARES} shares.`);
+      }
+
       const importedShares = imported.shares.map(
         (share) => `${share.x.toString()},${share.y.toString()}`,
       );
@@ -100,9 +118,9 @@ export default function RecoverPage() {
       !threshold.trim() ||
       !Number.isInteger(required) ||
       required < 2 ||
-      required > 256
+      required > MAX_SHARES
     ) {
-      setError("Threshold must be an integer between 2 and 256.");
+      setError(`Threshold must be an integer between 2 and ${MAX_SHARES}.`);
       return;
     }
 
@@ -141,6 +159,7 @@ export default function RecoverPage() {
 
     try {
       setResult(reconstructSecret(parsed, required));
+      setImportMessage("");
     } catch {
       setError("Could not recover the secret. Check the selected shares.");
     }
@@ -207,12 +226,13 @@ export default function RecoverPage() {
             id="threshold"
             type="number"
             min="2"
-            max="256"
+            max={MAX_SHARES}
             value={threshold}
             onChange={(event) => {
               setThreshold(event.target.value);
               setResult(null);
               setError("");
+              setImportMessage("");
             }}
             className="mt-3 w-full max-w-xs border border-[#28251F]/25 bg-transparent px-4 py-3 outline-none focus:border-[#702632]"
           />
@@ -269,10 +289,15 @@ export default function RecoverPage() {
           <button
             type="button"
             onClick={addShare}
-            className="mt-5 text-sm underline underline-offset-4"
+            disabled={shares.length >= MAX_SHARES}
+            className="mt-5 text-sm underline underline-offset-4 disabled:cursor-not-allowed disabled:opacity-40"
           >
             + Add another share
           </button>
+
+          <p className="mt-2 text-xs text-[#28251F]/55">
+            {shares.length} of {MAX_SHARES} maximum shares
+          </p>
         </div>
 
         <button
