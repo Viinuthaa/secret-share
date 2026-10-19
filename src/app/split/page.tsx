@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -88,17 +89,6 @@ export default function SplitPage() {
   }
 
   const maxX = Math.max(shares.length, 1);
-  const graphPoints = coefficients.map((_, index) => {
-    const x = index;
-    const y = Number(evaluatePolynomial(coefficients, BigInt(x)));
-
-    return {
-      x,
-      y,
-      plotX: chart.left + (x / maxX) * chart.width,
-      plotY: chart.bottom - (y / 256) * chart.height,
-    };
-  });
 
   const curve = Array.from({ length: shares.length + 1 }, (_, x) => {
     const y = Number(evaluatePolynomial(coefficients, BigInt(x)));

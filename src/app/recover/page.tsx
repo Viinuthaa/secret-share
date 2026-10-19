@@ -1,9 +1,9 @@
-
 "use client";
 
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { reconstructSecret } from "@/lib/reconstruct";
+import { parseShareFile } from "@/lib/share-file";
 import type { Share } from "@/lib/shamir";
 
 export default function RecoverPage() {
@@ -17,7 +17,7 @@ export default function RecoverPage() {
 
   function updateShare(index: number, value: string) {
     setShares((current) =>
-      current.map((share, i) => (i === index ? value : share))
+      current.map((share, i) => (i === index ? value : share)),
     );
     setResult(null);
     setError("");
@@ -28,7 +28,7 @@ export default function RecoverPage() {
     setSelected((current) =>
       current.includes(index)
         ? current.filter((item) => item !== index)
-        : [...current, index]
+        : [...current, index],
     );
     setResult(null);
     setError("");
@@ -45,7 +45,7 @@ export default function RecoverPage() {
     setSelected((current) =>
       current
         .filter((item) => item !== index)
-        .map((item) => (item > index ? item - 1 : item))
+        .map((item) => (item > index ? item - 1 : item)),
     );
     setResult(null);
     setError("");
@@ -70,58 +70,20 @@ export default function RecoverPage() {
 
     try {
       const content = await file.text();
-      const thresholdMatch = content.match(/^Threshold:\s*(\d+)\s*$/im);
-      const shareMatches = [
-        ...content.matchAll(/^Share\s+\d+:\s*(\d+\s*,\s*\d+)\s*$/gim),
-      ];
-
-      if (!thresholdMatch || shareMatches.length === 0) {
-        throw new Error("This file does not contain a supported share export.");
-      }
-
-      const importedThreshold = Number(thresholdMatch[1]);
-      const importedShares = shareMatches.map((match) =>
-        match[1].replace(/\s+/g, "")
+      const imported = parseShareFile(content);
+      const importedShares = imported.shares.map(
+        (share) => `${share.x.toString()},${share.y.toString()}`,
       );
 
-      if (
-        !Number.isInteger(importedThreshold) ||
-        importedThreshold < 2 ||
-        importedThreshold > 256
-      ) {
-        throw new Error("The file contains an invalid threshold.");
-      }
-
-      const coordinates = importedShares.map((share) => {
-        const [xText, yText] = share.split(",");
-        const x = BigInt(xText);
-        const y = BigInt(yText);
-
-        if (x < 1n || x > 256n || y < 0n || y > 256n) {
-          throw new Error("The file contains invalid share coordinates.");
-        }
-
-        return { x, y };
-      });
-
-      if (coordinates.length < importedThreshold) {
-        throw new Error("The file contains fewer shares than its threshold.");
-      }
-
-      if (
-        new Set(coordinates.map((share) => share.x.toString())).size !==
-        coordinates.length
-      ) {
-        throw new Error("The file contains duplicate share coordinates.");
-      }
-
-      setThreshold(String(importedThreshold));
+      setThreshold(String(imported.threshold));
       setShares(importedShares);
       setSelected(importedShares.map((_, index) => index));
-      setImportMessage(`${importedShares.length} shares imported successfully.`);
+      setImportMessage(
+        `${importedShares.length} shares imported successfully.`,
+      );
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Could not import this file."
+        err instanceof Error ? err.message : "Could not import this file.",
       );
     } finally {
       if (fileInput.current) fileInput.current.value = "";
@@ -154,7 +116,7 @@ export default function RecoverPage() {
     const parsed: Share[] = [];
 
     for (const share of chosen) {
-      const match = share.trim().match(/^(\d+)\s*,\s*(\d+)$/);
+      const match = share.trim().match(/^(\d{1,3})\s*,\s*(\d{1,3})$/);
 
       if (!match) {
         setError("Each selected share must use x, y format.");
