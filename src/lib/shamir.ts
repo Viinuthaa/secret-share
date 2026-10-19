@@ -11,13 +11,22 @@ export type GeneratedShares = {
 };
 
 function randomFieldElement(): bigint {
+  if (
+    typeof globalThis.crypto === "undefined" ||
+    typeof globalThis.crypto.getRandomValues !== "function"
+  ) {
+    throw new Error(
+      "Secure randomness is unavailable. Use a supported browser with HTTPS or localhost.",
+    );
+  }
+
   const range = 65536;
   const prime = Number(PRIME);
   const limit = Math.floor(range / prime) * prime;
   const values = new Uint16Array(1);
 
   while (true) {
-    crypto.getRandomValues(values);
+    globalThis.crypto.getRandomValues(values);
 
     if (values[0] < limit) {
       return BigInt(values[0] % prime);

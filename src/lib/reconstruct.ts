@@ -5,7 +5,11 @@ export function reconstructSecret(
   shares: Share[],
   threshold: number,
 ): bigint {
-  if (!Number.isInteger(threshold) || threshold < 1) {
+  if (
+    !Number.isInteger(threshold) ||
+    threshold < 1 ||
+    threshold >= Number(PRIME)
+  ) {
     throw new RangeError("Invalid threshold");
   }
 
@@ -13,9 +17,13 @@ export function reconstructSecret(
     throw new RangeError("Not enough shares");
   }
 
-  const selected = shares.slice(0, threshold);
+  if (shares.length >= Number(PRIME)) {
+    throw new RangeError("Too many shares");
+  }
 
-  for (const share of selected) {
+  const seenCoordinates = new Set<string>();
+
+  for (const share of shares) {
     if (
       share.x <= 0n ||
       share.x >= PRIME ||
@@ -24,16 +32,17 @@ export function reconstructSecret(
     ) {
       throw new RangeError("Invalid share values");
     }
-  }
 
-  for (let i = 0; i < selected.length; i++) {
-    for (let j = i + 1; j < selected.length; j++) {
-      if (selected[i].x === selected[j].x) {
-        throw new RangeError("Duplicate share coordinates");
-      }
+    const coordinate = share.x.toString();
+
+    if (seenCoordinates.has(coordinate)) {
+      throw new RangeError("Duplicate share coordinates");
     }
+
+    seenCoordinates.add(coordinate);
   }
 
+  const selected = shares.slice(0, threshold);
   let secret = 0n;
 
   for (let i = 0; i < selected.length; i++) {
