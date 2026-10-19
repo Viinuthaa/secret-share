@@ -1,9 +1,13 @@
-
-import { PRIME } from "./field";
+import { PRIME, mod } from "./field";
 
 export type Share = {
   x: bigint;
   y: bigint;
+};
+
+export type GeneratedShares = {
+  shares: Share[];
+  coefficients: bigint[];
 };
 
 function randomFieldElement(): bigint {
@@ -21,11 +25,24 @@ function randomFieldElement(): bigint {
   }
 }
 
-export function splitSecret(
+export function evaluatePolynomial(
+  coefficients: bigint[],
+  x: bigint,
+): bigint {
+  let result = 0n;
+
+  for (let i = coefficients.length - 1; i >= 0; i--) {
+    result = mod(result * x + coefficients[i]);
+  }
+
+  return result;
+}
+
+export function generateShares(
   secret: bigint,
   threshold: number,
   totalShares: number,
-): Share[] {
+): GeneratedShares {
   if (secret < 0n || secret >= PRIME) {
     throw new RangeError(`Secret must be between 0 and ${PRIME - 1n}.`);
   }
@@ -49,16 +66,19 @@ export function splitSecret(
   const shares: Share[] = [];
 
   for (let x = 1; x <= totalShares; x++) {
-    let y = 0n;
-    let power = 1n;
-
-    for (const coefficient of coefficients) {
-      y = (y + coefficient * power) % PRIME;
-      power = (power * BigInt(x)) % PRIME;
-    }
-
-    shares.push({ x: BigInt(x), y });
+    shares.push({
+      x: BigInt(x),
+      y: evaluatePolynomial(coefficients, BigInt(x)),
+    });
   }
 
-  return shares;
+  return { shares, coefficients };
+}
+
+export function splitSecret(
+  secret: bigint,
+  threshold: number,
+  totalShares: number,
+): Share[] {
+  return generateShares(secret, threshold, totalShares).shares;
 }
