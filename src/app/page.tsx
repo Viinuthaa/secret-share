@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 
 const steps = [
@@ -107,32 +108,25 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#F3F0E6] text-[#252522]">
       <header className="border-b border-[#252522]/20">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-10">
-          <Link
-            href="/"
-            className="shrink-0 text-xl font-bold tracking-tight"
-          >
+        <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-10">
+          <Link href="/" className="shrink-0 text-xl font-bold tracking-tight">
             secret<span className="text-[#702632]">/</span>share
           </Link>
 
-          <div className="hidden items-center gap-5 text-xs uppercase tracking-[0.12em] text-[#55554D] sm:flex lg:gap-7">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] uppercase tracking-[0.1em] text-[#55554D] sm:gap-x-6 sm:text-xs sm:tracking-[0.12em]">
             <a href="#method" className="transition hover:text-[#702632]">
               Method
             </a>
             <a href="#about" className="transition hover:text-[#702632]">
               About
             </a>
-            <Link
-              href="/split"
-              className="transition hover:text-[#702632]"
-            >
-              Split a secret
+            <Link href="/split" className="transition hover:text-[#702632]">
+              Split
+            </Link>
+            <Link href="/recover" className="transition hover:text-[#702632]">
+              Recover
             </Link>
           </div>
-
-          <span className="shrink-0 border border-[#702632]/40 px-2.5 py-1.5 text-[9px] uppercase tracking-[0.12em] text-[#702632] sm:px-3 sm:text-[10px]">
-            In development
-          </span>
         </nav>
       </header>
 
@@ -156,19 +150,26 @@ export default function Home() {
             chosen number of them to reconstruct it.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-4 sm:mt-9">
+          <div className="mt-8 flex flex-wrap items-center gap-3 sm:mt-9">
             <Link
               href="/split"
               className="bg-[#702632] px-5 py-3 text-sm text-[#F3F0E6] transition hover:bg-[#54202A]"
             >
               Split a secret <span className="ml-3">↗</span>
             </Link>
-            <span className="text-xs text-[#77766D]">
-              No account required
-            </span>
+            <Link
+              href="/recover"
+              className="border border-[#702632]/50 px-5 py-3 text-sm text-[#702632] transition hover:bg-[#E9E5D9]"
+            >
+              Recover a secret <span className="ml-2">↗</span>
+            </Link>
           </div>
 
-          <div className="mt-12 grid w-full max-w-lg grid-cols-3 border-y border-[#252522]/20 py-5 sm:mt-14">
+          <p className="mt-4 text-xs text-[#77766D]">
+            No account required.
+          </p>
+
+          <div className="mt-12 grid w-full max-w-lg grid-cols-2 border-y border-[#252522]/20 py-5 sm:mt-14">
             <div>
               <p className="font-serif text-2xl sm:text-3xl">K / N</p>
               <p className="mt-1 text-[9px] uppercase tracking-[0.1em] text-[#77766D] sm:text-[10px] sm:tracking-[0.12em]">
@@ -176,17 +177,10 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="border-l border-[#252522]/20 pl-3 sm:pl-5">
+            <div className="border-l border-[#252522]/20 pl-5">
               <p className="font-serif text-2xl sm:text-3xl">GF(p)</p>
               <p className="mt-1 text-[9px] uppercase tracking-[0.1em] text-[#77766D] sm:text-[10px] sm:tracking-[0.12em]">
                 Finite field
-              </p>
-            </div>
-
-            <div className="border-l border-[#252522]/20 pl-3 sm:pl-5">
-              <p className="font-serif text-2xl sm:text-3xl">0×01</p>
-              <p className="mt-1 text-[9px] uppercase tracking-[0.1em] text-[#77766D] sm:text-[10px] sm:tracking-[0.12em]">
-                Build status
               </p>
             </div>
           </div>
@@ -230,26 +224,51 @@ export default function Home() {
               </article>
             ))}
           </div>
+
+          <div className="mt-8 flex flex-wrap gap-4">
+            <Link
+              href="/split"
+              className="text-sm text-[#702632] underline underline-offset-4 hover:text-[#54202A]"
+            >
+              Start splitting ↗
+            </Link>
+            <Link
+              href="/recover"
+              className="text-sm text-[#702632] underline underline-offset-4 hover:text-[#54202A]"
+            >
+              Recover a secret ↗
+            </Link>
+            <Link
+              href="/learn"
+              className="text-sm text-[#702632] underline underline-offset-4 hover:text-[#54202A]"
+            >
+              Learn how it works ↗
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section id="about" className="bg-[#252522] text-[#F3F0E6]">
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
+      <footer id="about" className="bg-[#252522] text-[#F3F0E6]">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
           <div>
-            <p className="text-lg font-semibold">
+            <Link href="/" className="text-lg font-semibold">
               secret<span className="text-[#A8B56A]">/</span>share
-            </p>
-            <p className="mt-1 text-sm text-[#B9B7AC]">
-              An educational cryptography project.
+            </Link>
+            <p className="mt-2 text-sm text-[#B9B7AC]">
+              Made with curiosity and a little cryptography.
             </p>
           </div>
-          <p className="max-w-md text-xs leading-5 text-[#B9B7AC]">
-            Under development. This interface is a prototype; do not use it to
-            protect production secrets until the implementation has been
-            independently reviewed.
-          </p>
+
+          <a
+            href="https://github.com/Viinuthaa/secret-share"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 self-start border border-[#F3F0E6]/25 px-4 py-3 text-sm transition hover:border-[#A8B56A] hover:text-[#A8B56A] sm:self-center"
+          >
+            ⭐ Star this project on GitHub <span>↗</span>
+          </a>
         </div>
-      </section>
+      </footer>
     </main>
   );
 }
