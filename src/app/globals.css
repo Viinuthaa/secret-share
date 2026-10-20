@@ -12,10 +12,10 @@ html {
 
 body {
   margin: 0;
+  min-width: 320px;
   background: #F3F0E6;
   color: #252522;
   font-family: Arial, Helvetica, sans-serif;
-  min-width: 320px;
 }
 
 ::selection {
@@ -48,6 +48,24 @@ button {
   touch-action: manipulation;
 }
 
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 3px solid #702632;
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 @media (max-width: 640px) {
   h1 {
     overflow-wrap: anywhere;
@@ -77,5 +95,19 @@ button {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 3px solid Highlight;
+  }
+
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    forced-color-adjust: auto;
   }
 }

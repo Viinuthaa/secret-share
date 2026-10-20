@@ -28,63 +28,101 @@ const steps = [
   },
 ];
 
+const exampleShares = ["(1, 8)", "(2, 15)", "(3, 26)"];
+
 export default function LearnPage() {
   return (
     <main className="min-h-screen bg-[#F3F0E6] text-[#28251F]">
-      <nav className="flex flex-wrap items-center justify-between gap-4 border-b border-[#28251F]/15 px-6 py-5 md:px-12">
-        <Link href="/" className="text-xl font-semibold tracking-tight">
-          secret<span className="text-[#702632]">/</span>share
-        </Link>
+      <header className="border-b border-[#28251F]/15">
+        <nav
+          aria-label="Main navigation"
+          className="flex flex-wrap items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-12"
+        >
+          <Link
+            href="/"
+            aria-label="Secret Share home"
+            className="text-xl font-semibold tracking-tight focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#702632]"
+          >
+            secret<span className="text-[#702632]">/</span>share
+          </Link>
 
-        <div className="flex flex-wrap gap-5 text-sm">
-          <Link href="/split" className="hover:underline">
-            Split
-          </Link>
-          <Link href="/recover" className="hover:underline">
-            Recover
-          </Link>
-          <Link href="/learn" className="text-[#702632] underline underline-offset-4">
-            How it works
-          </Link>
-        </div>
-      </nav>
+          <div className="flex flex-wrap gap-x-5 gap-y-3 text-sm">
+            <Link
+              href="/split"
+              className="underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#702632]"
+            >
+              Split
+            </Link>
+            <Link
+              href="/recover"
+              className="underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#702632]"
+            >
+              Recover
+            </Link>
+            <Link
+              href="/learn"
+              aria-current="page"
+              className="text-[#702632] underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#702632]"
+            >
+              How it works
+            </Link>
+          </div>
+        </nav>
+      </header>
 
-      <section className="mx-auto max-w-4xl px-6 py-16 md:py-24">
-        <p className="text-xs uppercase tracking-[0.25em] text-[#702632]">
+      <section
+        aria-labelledby="page-title"
+        className="mx-auto max-w-4xl px-5 py-14 sm:px-8 sm:py-20"
+      >
+        <p className="text-xs uppercase tracking-[0.2em] text-[#702632]">
           Part 03 / The mathematics
         </p>
 
-        <h1 className="mt-5 max-w-3xl font-serif text-5xl leading-tight tracking-tight md:text-7xl">
+        <h1
+          id="page-title"
+          className="mt-5 max-w-3xl font-serif text-4xl leading-tight tracking-tight sm:text-5xl lg:text-7xl"
+        >
           The math behind the secret.
         </h1>
 
-        <p className="mt-7 max-w-2xl text-base leading-8 text-[#28251F]/70">
+        <p className="mt-7 max-w-2xl text-base leading-8 text-[#28251F]/75">
           Secret Share uses Shamir&apos;s Secret Sharing. Instead of storing a
           secret in one place, it divides the secret into mathematical shares.
           A minimum number of shares is needed to recover the original value.
         </p>
 
-        <div className="mt-16 border-t border-[#28251F]/20">
+        <ol className="mt-16 border-t border-[#28251F]/20">
           {steps.map((step) => (
-            <div
+            <li
               key={step.number}
-              className="grid gap-4 border-b border-[#28251F]/15 py-8 md:grid-cols-[80px_1fr_1.5fr]"
+              className="grid gap-3 border-b border-[#28251F]/15 py-8 sm:gap-4 md:grid-cols-[80px_1fr_1.5fr]"
             >
-              <span className="text-sm text-[#702632]">{step.number}</span>
+              <span
+                aria-hidden="true"
+                className="text-sm text-[#702632]"
+              >
+                {step.number}
+              </span>
               <h2 className="font-serif text-2xl">{step.title}</h2>
-              <p className="text-sm leading-7 text-[#28251F]/70">
+              <p className="text-sm leading-7 text-[#28251F]/75">
                 {step.description}
               </p>
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
 
-        <section className="mt-16 border border-[#28251F]/20 bg-[#E9E5D9] p-6 sm:p-10">
+        <section
+          aria-labelledby="interpolation-title"
+          className="mt-16 border border-[#28251F]/20 bg-[#E9E5D9] p-5 sm:p-10"
+        >
           <p className="text-xs uppercase tracking-[0.2em] text-[#702632]">
             Lagrange interpolation
           </p>
 
-          <h2 className="mt-4 font-serif text-3xl">
+          <h2
+            id="interpolation-title"
+            className="mt-4 font-serif text-3xl"
+          >
             Recovering the value at zero.
           </h2>
 
@@ -92,16 +130,19 @@ export default function LearnPage() {
             Suppose we have a threshold of 3 and three shares:
           </p>
 
-          <div className="mt-6 grid grid-cols-3 gap-3">
-            {["(1, 8)", "(2, 15)", "(3, 26)"].map((point) => (
-              <div
+          <ul
+            aria-label="Example shares"
+            className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3"
+          >
+            {exampleShares.map((point) => (
+              <li
                 key={point}
                 className="border border-[#28251F]/20 bg-[#F3F0E6] px-3 py-5 text-center font-mono text-sm"
               >
                 {point}
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
 
           <p className="mt-6 text-sm leading-7 text-[#28251F]/75">
             These points lie on the polynomial f(x) = 2x² + x + 5.
@@ -109,16 +150,21 @@ export default function LearnPage() {
             giving f(0) = 5. The recovered secret is 5.
           </p>
 
-          <div className="mt-8 border-l-2 border-[#702632] pl-5">
+          <div
+            className="mt-8 border-l-2 border-[#702632] pl-5"
+            aria-label="Recovered secret is 5"
+          >
             <p className="font-serif text-2xl">f(0) = 5</p>
-            <p className="mt-2 text-xs text-[#28251F]/60">
+            <p className="mt-2 text-xs text-[#28251F]/70">
               Original secret recovered
             </p>
           </div>
         </section>
 
-        <section className="mt-14">
-          <h2 className="font-serif text-3xl">Why the threshold matters.</h2>
+        <section aria-labelledby="threshold-title" className="mt-14">
+          <h2 id="threshold-title" className="font-serif text-3xl">
+            Why the threshold matters.
+          </h2>
 
           <p className="mt-5 max-w-2xl text-sm leading-8 text-[#28251F]/75">
             A polynomial of degree 2 needs three distinct points to determine
@@ -137,14 +183,14 @@ export default function LearnPage() {
         <div className="mt-16 flex flex-wrap gap-4">
           <Link
             href="/split"
-            className="bg-[#702632] px-6 py-4 text-sm text-[#F3F0E6] transition hover:bg-[#54202A]"
+            className="inline-flex min-h-11 items-center justify-center bg-[#702632] px-6 py-4 text-sm text-[#F3F0E6] transition-colors hover:bg-[#54202A] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[#702632] motion-reduce:transition-none"
           >
-            Try splitting a secret →
+            Try splitting a secret <span aria-hidden="true" className="ml-2">→</span>
           </Link>
 
           <Link
             href="/recover"
-            className="border border-[#702632] px-6 py-4 text-sm text-[#702632] transition hover:bg-[#702632] hover:text-[#F3F0E6]"
+            className="inline-flex min-h-11 items-center justify-center border border-[#702632] px-6 py-4 text-sm text-[#702632] transition-colors hover:bg-[#702632] hover:text-[#F3F0E6] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[#702632] motion-reduce:transition-none"
           >
             Recover a secret
           </Link>

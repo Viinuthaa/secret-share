@@ -18,13 +18,17 @@ export default function RecoverPage() {
   const [importMessage, setImportMessage] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
 
+  function clearMessages() {
+    setResult(null);
+    setError("");
+    setImportMessage("");
+  }
+
   function updateShare(index: number, value: string) {
     setShares((current) =>
       current.map((share, i) => (i === index ? value : share)),
     );
-    setResult(null);
-    setError("");
-    setImportMessage("");
+    clearMessages();
   }
 
   function toggleShare(index: number) {
@@ -33,23 +37,17 @@ export default function RecoverPage() {
         ? current.filter((item) => item !== index)
         : [...current, index],
     );
-    setResult(null);
-    setError("");
-    setImportMessage("");
+    clearMessages();
   }
 
   function selectAllShares() {
     setSelected(shares.map((_, index) => index));
-    setResult(null);
-    setError("");
-    setImportMessage("");
+    clearMessages();
   }
 
   function clearSelection() {
     setSelected([]);
-    setResult(null);
-    setError("");
-    setImportMessage("");
+    clearMessages();
   }
 
   function addShare() {
@@ -61,9 +59,7 @@ export default function RecoverPage() {
     const index = shares.length;
     setShares((current) => [...current, ""]);
     setSelected((current) => [...current, index]);
-    setResult(null);
-    setError("");
-    setImportMessage("");
+    clearMessages();
   }
 
   function removeShare(index: number) {
@@ -73,15 +69,11 @@ export default function RecoverPage() {
         .filter((item) => item !== index)
         .map((item) => (item > index ? item - 1 : item)),
     );
-    setResult(null);
-    setError("");
-    setImportMessage("");
+    clearMessages();
   }
 
   async function importShares(file: File | undefined) {
-    setError("");
-    setImportMessage("");
-    setResult(null);
+    clearMessages();
 
     if (!file) return;
 
@@ -125,6 +117,7 @@ export default function RecoverPage() {
   function recoverSecret() {
     setResult(null);
     setError("");
+    setImportMessage("");
 
     const required = Number(threshold);
 
@@ -173,42 +166,42 @@ export default function RecoverPage() {
 
     try {
       setResult(reconstructSecret(parsed, required));
-      setImportMessage("");
     } catch {
       setError("Could not recover the secret. Check the selected shares.");
     }
   }
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#F3F0E6] text-[#28251F]">
+    <main className="min-h-screen bg-[#F3F0E6] text-[#28251F]">
       <header className="border-b border-[#28251F]/15">
-        <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-8 sm:py-5 lg:px-12">
-          <Link
-            href="/"
-            className="shrink-0 text-xl font-semibold tracking-tight"
-          >
+        <nav
+          aria-label="Main navigation"
+          className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:px-12"
+        >
+          <Link href="/" className="text-xl font-semibold tracking-tight">
             secret<span className="text-[#702632]">/</span>share
           </Link>
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs sm:gap-5 sm:text-sm">
-            <Link
-              href="/split"
-              className="py-1 underline underline-offset-4"
-            >
+          <div className="flex flex-wrap gap-x-5 gap-y-3 text-sm">
+            <Link href="/split" className="underline underline-offset-4">
               Split a secret
             </Link>
             <Link
-              href="/learn"
-              className="py-1 underline underline-offset-4"
+              href="/recover"
+              aria-current="page"
+              className="font-semibold underline underline-offset-4"
             >
+              Recover a secret
+            </Link>
+            <Link href="/learn" className="underline underline-offset-4">
               How it works
             </Link>
           </div>
         </nav>
       </header>
 
-      <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-16 md:py-24">
-        <p className="mb-4 text-[10px] uppercase tracking-[0.18em] text-[#702632] sm:mb-5 sm:text-xs sm:tracking-[0.25em]">
+      <section className="mx-auto max-w-3xl px-5 py-12 sm:px-8 sm:py-20">
+        <p className="mb-5 text-xs uppercase tracking-[0.25em] text-[#702632]">
           Part 02 / Recovery
         </p>
 
@@ -216,62 +209,90 @@ export default function RecoverPage() {
           Bring the pieces back together.
         </h1>
 
-        <p className="mt-5 max-w-xl text-sm leading-7 text-[#28251F]/70 sm:mt-6 sm:text-base">
+        <p className="mt-6 max-w-xl text-base leading-7 text-[#28251F]/70">
           Import saved shares or enter them manually. Select the shares you
           want to use for reconstruction.
         </p>
 
-        <div className="mt-8 border border-[#252522]/20 bg-[#E9E5D9] p-4 sm:mt-10 sm:p-8">
-          <h2 className="font-serif text-2xl">Import saved shares</h2>
-          <p className="mt-2 text-sm leading-6 text-[#626158]">
-            Select a .txt file downloaded from the Split page.
+        <section
+          aria-labelledby="import-heading"
+          className="mt-10 border border-[#252522]/20 bg-[#E9E5D9] p-5 sm:p-8"
+        >
+          <h2 id="import-heading" className="font-serif text-2xl">
+            Import saved shares
+          </h2>
+          <p id="import-help" className="mt-2 text-sm leading-6 text-[#626158]">
+            Select a .txt file downloaded from the Split page. Maximum file
+            size: 100 KB.
           </p>
 
-          <input
-            ref={fileInput}
-            type="file"
-            accept=".txt,text/plain"
-            aria-label="Import saved shares text file"
-            onChange={(event) => void importShares(event.target.files?.[0])}
-            className="mt-5 block min-h-12 w-full min-w-0 text-sm file:mr-3 file:min-h-11 file:border-0 file:bg-[#702632] file:px-3 file:py-3 file:text-[#F3F0E6] hover:file:bg-[#54202A] sm:file:mr-4 sm:file:px-4"
-          />
-
-          {importMessage && (
-            <p role="status" className="mt-4 break-words text-sm text-green-800">
-              {importMessage}
-            </p>
-          )}
-        </div>
-
-        <div className="mt-8 border-t border-[#28251F]/20 pt-6 sm:mt-10 sm:pt-8">
-          <label htmlFor="threshold" className="block text-sm font-medium">
-            Required number of shares
+          <label htmlFor="share-file" className="sr-only">
+            Choose a saved shares text file
           </label>
           <input
+            ref={fileInput}
+            id="share-file"
+            name="shareFile"
+            type="file"
+            accept=".txt,text/plain"
+            aria-describedby="import-help"
+            onChange={(event) => void importShares(event.target.files?.[0])}
+            className="mt-5 block w-full text-sm file:mr-4 file:border-0 file:bg-[#702632] file:px-4 file:py-3 file:text-[#F3F0E6] hover:file:bg-[#54202A]"
+          />
+
+          <p
+            role="status"
+            aria-live="polite"
+            className={importMessage ? "mt-4 text-sm text-green-800" : "sr-only"}
+          >
+            {importMessage}
+          </p>
+        </section>
+
+        <section
+          aria-labelledby="threshold-heading"
+          className="mt-10 border-t border-[#28251F]/20 pt-8"
+        >
+          <label
+            htmlFor="threshold"
+            id="threshold-heading"
+            className="block text-sm font-medium"
+          >
+            Required number of shares
+          </label>
+          <p id="threshold-help" className="mt-2 text-sm text-[#626158]">
+            Enter an integer between 2 and {MAX_SHARES}.
+          </p>
+          <input
             id="threshold"
+            name="threshold"
             type="number"
             min="2"
             max={MAX_SHARES}
+            step="1"
+            required
+            inputMode="numeric"
             value={threshold}
+            aria-describedby="threshold-help"
             onChange={(event) => {
               setThreshold(event.target.value);
-              setResult(null);
-              setError("");
-              setImportMessage("");
+              clearMessages();
             }}
-            className="mt-3 min-h-12 w-full max-w-xs border border-[#28251F]/25 bg-transparent px-4 py-3 outline-none focus:border-[#702632]"
+            className="mt-3 w-full max-w-xs border border-[#28251F]/25 bg-transparent px-4 py-3 focus-visible:border-[#702632]"
           />
-        </div>
+        </section>
 
-        <div className="mt-8 sm:mt-10">
+        <section className="mt-10" aria-labelledby="shares-heading">
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-            <h2 className="font-serif text-2xl">Your shares</h2>
-            <span className="text-xs text-[#28251F]/60 sm:text-sm">
+            <h2 id="shares-heading" className="font-serif text-2xl">
+              Your shares
+            </h2>
+            <p className="text-sm text-[#28251F]/70" aria-live="polite">
               {selected.length} of {shares.length} selected
-            </span>
+            </p>
           </div>
 
-          <div className="mb-5 flex flex-wrap gap-x-5 gap-y-3">
+          <div className="mb-5 flex flex-wrap gap-4">
             <button
               type="button"
               onClick={selectAllShares}
@@ -294,33 +315,42 @@ export default function RecoverPage() {
             {shares.map((share, index) => (
               <div
                 key={index}
-                className="grid min-w-0 grid-cols-[auto_auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 border border-[#28251F]/15 bg-white/30 px-3 py-3 sm:flex sm:gap-3 sm:px-4"
+                className="grid grid-cols-[auto_auto_minmax(0,1fr)] items-center gap-3 border border-[#28251F]/15 bg-white/30 px-3 py-3 sm:flex sm:px-4"
               >
                 <input
+                  id={`select-share-${index}`}
                   type="checkbox"
-                  aria-label={`Select share ${index + 1}`}
                   checked={selected.includes(index)}
                   onChange={() => toggleShare(index)}
                   className="h-5 w-5 accent-[#702632]"
                 />
 
-                <span className="w-8 text-sm text-[#28251F]/50">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
+                <label
+                  htmlFor={`select-share-${index}`}
+                  className="text-sm text-[#28251F]/70"
+                >
+                  {`Share ${String(index + 1).padStart(2, "0")}`}
+                </label>
 
+                <label htmlFor={`share-value-${index}`} className="sr-only">
+                  {`Coordinates for share ${index + 1}, in x, y format`}
+                </label>
                 <input
-                  aria-label={`Share ${index + 1} coordinates`}
+                  id={`share-value-${index}`}
+                  name={`share-${index + 1}`}
                   value={share}
                   onChange={(event) => updateShare(index, event.target.value)}
-                  placeholder="Enter share as x, y"
-                  className="col-span-3 min-h-11 w-full min-w-0 border-b border-transparent bg-transparent px-1 py-2 text-sm outline-none focus:border-[#702632] sm:col-span-1 sm:flex-1 sm:px-2"
+                  placeholder="Enter x, y"
+                  autoComplete="off"
+                  spellCheck={false}
+                  className="col-span-3 min-w-0 border-b border-transparent bg-transparent px-2 py-3 focus-visible:border-[#702632] sm:col-span-1 sm:flex-1"
                 />
 
                 {shares.length > 2 && (
                   <button
                     type="button"
                     onClick={() => removeShare(index)}
-                    className="col-span-3 min-h-10 justify-self-start px-1 text-xs text-[#702632] hover:underline sm:col-span-1"
+                    className="col-span-3 min-h-10 justify-self-start text-sm text-[#702632] underline underline-offset-4 sm:col-span-1"
                     aria-label={`Remove share ${index + 1}`}
                   >
                     Remove
@@ -334,48 +364,52 @@ export default function RecoverPage() {
             type="button"
             onClick={addShare}
             disabled={shares.length >= MAX_SHARES}
-            className="mt-5 min-h-10 text-left text-sm underline underline-offset-4 disabled:cursor-not-allowed disabled:opacity-40"
+            className="mt-5 min-h-10 text-sm underline underline-offset-4 disabled:cursor-not-allowed disabled:opacity-40"
           >
             + Add another share
           </button>
 
-          <p className="mt-2 text-xs text-[#28251F]/55">
+          <p className="mt-2 text-xs text-[#28251F]/65">
             {shares.length} of {MAX_SHARES} maximum shares
           </p>
-        </div>
+        </section>
 
         <button
           type="button"
           onClick={recoverSecret}
-          className="mt-8 min-h-12 w-full bg-[#702632] px-6 py-4 text-sm font-medium text-[#F3F0E6] transition hover:bg-[#57202A] sm:mt-10 sm:w-auto"
+          className="mt-10 min-h-12 w-full bg-[#702632] px-6 py-4 text-sm font-medium text-[#F3F0E6] transition hover:bg-[#57202A] sm:w-auto"
         >
-          Recover secret →
+          Recover secret <span aria-hidden="true">→</span>
         </button>
 
-        {error && (
-          <p role="alert" className="mt-5 break-words text-sm text-[#702632]">
-            {error}
-          </p>
-        )}
+        <p
+          role="alert"
+          aria-live="assertive"
+          className={error ? "mt-5 text-sm text-[#702632]" : "sr-only"}
+        >
+          {error}
+        </p>
 
         {result !== null && (
-          <div
+          <section
+            aria-labelledby="result-heading"
             aria-live="polite"
-            className="mt-8 border border-[#A8B56A] bg-[#A8B56A]/15 p-4 sm:p-6"
+            className="mt-8 border border-[#A8B56A] bg-[#A8B56A]/15 p-6"
           >
             <p className="text-xs uppercase tracking-[0.2em]">
               Recovered secret
             </p>
-            <p className="mt-3 break-words font-serif text-4xl">
-              {result.toString()}
-            </p>
+            <h2 id="result-heading" className="sr-only">
+              Secret recovered successfully
+            </h2>
+            <p className="mt-3 font-serif text-4xl">{result.toString()}</p>
             <p className="mt-3 text-sm text-[#28251F]/70">
               Reconstruction completed using the selected shares.
             </p>
-          </div>
+          </section>
         )}
 
-        <p className="mt-10 border-t border-[#28251F]/15 pt-5 text-xs leading-6 text-[#28251F]/55 sm:mt-12">
+        <p className="mt-12 border-t border-[#28251F]/15 pt-5 text-xs leading-6 text-[#28251F]/65">
           This is an educational demonstration using a small finite field.
           Do not use it to protect real secrets.
         </p>
