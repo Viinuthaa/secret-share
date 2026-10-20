@@ -178,11 +178,6 @@ export default function HomePage() {
               Learn the basics
             </Link>
           </div>
-
-          <p className="mt-6 max-w-lg text-xs leading-6 text-[#626158]">
-            Educational demonstration only. Do not use this application to
-            protect real passwords, keys, or confidential information.
-          </p>
         </div>
 
         <ShareDiagram />
@@ -237,16 +232,28 @@ export default function HomePage() {
       </section>
 
       <footer className="border-t border-[#252522]/20">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-7 text-xs leading-6 text-[#626158] sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <p>Secret Share · An educational cryptography project</p>
-          <Link
-            href="/learn"
-            className="w-fit text-[#702632] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#702632]"
+        <div className="mx-auto flex max-w-7xl flex-col items-start gap-5 px-5 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+          <p className="text-xs leading-6 text-[#626158]">
+            Secret Share · An educational cryptography project
+          </p>
+
+          <a
+            href="https://github.com/Viinuthaa/secret-share"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Star Secret Share on GitHub (opens in a new tab)"
+            className="inline-flex min-h-14 items-center justify-center gap-3 border border-[#702632] bg-[#702632] px-6 py-4 text-base font-semibold text-[#F3F0E6] transition-colors hover:bg-[#54202A] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-[#702632] motion-reduce:transition-none sm:px-8"
           >
-            Read the security notes
-          </Link>
+            <span aria-hidden="true" className="text-xl">
+              ⭐
+            </span>
+            Star on GitHub
+            <span aria-hidden="true">↗</span>
+          </a>
         </div>
       </footer>
     </main>
   );
 }
+
+
