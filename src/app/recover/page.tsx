@@ -38,6 +38,20 @@ export default function RecoverPage() {
     setImportMessage("");
   }
 
+  function selectAllShares() {
+    setSelected(shares.map((_, index) => index));
+    setResult(null);
+    setError("");
+    setImportMessage("");
+  }
+
+  function clearSelection() {
+    setSelected([]);
+    setResult(null);
+    setError("");
+    setImportMessage("");
+  }
+
   function addShare() {
     if (shares.length >= MAX_SHARES) {
       setError(`You can add at most ${MAX_SHARES} shares.`);
@@ -166,37 +180,48 @@ export default function RecoverPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F3F0E6] text-[#28251F]">
-      <nav className="flex items-center justify-between border-b border-[#28251F]/15 px-6 py-5 md:px-12">
-        <Link href="/" className="text-xl font-semibold tracking-tight">
-          secret<span className="text-[#702632]">/</span>share
-        </Link>
-
-        <div className="flex gap-5 text-sm">
-          <Link href="/split" className="underline underline-offset-4">
-            Split a secret
+    <main className="min-h-screen overflow-x-hidden bg-[#F3F0E6] text-[#28251F]">
+      <header className="border-b border-[#28251F]/15">
+        <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-8 sm:py-5 lg:px-12">
+          <Link
+            href="/"
+            className="shrink-0 text-xl font-semibold tracking-tight"
+          >
+            secret<span className="text-[#702632]">/</span>share
           </Link>
-          <Link href="/recover" className="underline underline-offset-4">
-            Recover a secret
-          </Link>
-        </div>
-      </nav>
 
-      <section className="mx-auto max-w-3xl px-6 py-16 md:py-24">
-        <p className="mb-5 text-xs uppercase tracking-[0.25em] text-[#702632]">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs sm:gap-5 sm:text-sm">
+            <Link
+              href="/split"
+              className="py-1 underline underline-offset-4"
+            >
+              Split a secret
+            </Link>
+            <Link
+              href="/learn"
+              className="py-1 underline underline-offset-4"
+            >
+              How it works
+            </Link>
+          </div>
+        </nav>
+      </header>
+
+      <section className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-16 md:py-24">
+        <p className="mb-4 text-[10px] uppercase tracking-[0.18em] text-[#702632] sm:mb-5 sm:text-xs sm:tracking-[0.25em]">
           Part 02 / Recovery
         </p>
 
-        <h1 className="max-w-2xl font-serif text-5xl leading-tight tracking-tight md:text-7xl">
+        <h1 className="max-w-2xl font-serif text-4xl leading-tight tracking-tight sm:text-5xl md:text-7xl">
           Bring the pieces back together.
         </h1>
 
-        <p className="mt-6 max-w-xl text-base leading-7 text-[#28251F]/70">
+        <p className="mt-5 max-w-xl text-sm leading-7 text-[#28251F]/70 sm:mt-6 sm:text-base">
           Import saved shares or enter them manually. Select the shares you
           want to use for reconstruction.
         </p>
 
-        <div className="mt-10 border border-[#252522]/20 bg-[#E9E5D9] p-6 sm:p-8">
+        <div className="mt-8 border border-[#252522]/20 bg-[#E9E5D9] p-4 sm:mt-10 sm:p-8">
           <h2 className="font-serif text-2xl">Import saved shares</h2>
           <p className="mt-2 text-sm leading-6 text-[#626158]">
             Select a .txt file downloaded from the Split page.
@@ -208,17 +233,17 @@ export default function RecoverPage() {
             accept=".txt,text/plain"
             aria-label="Import saved shares text file"
             onChange={(event) => void importShares(event.target.files?.[0])}
-            className="mt-5 block w-full text-sm file:mr-4 file:border-0 file:bg-[#702632] file:px-4 file:py-3 file:text-[#F3F0E6] hover:file:bg-[#54202A]"
+            className="mt-5 block min-h-12 w-full min-w-0 text-sm file:mr-3 file:min-h-11 file:border-0 file:bg-[#702632] file:px-3 file:py-3 file:text-[#F3F0E6] hover:file:bg-[#54202A] sm:file:mr-4 sm:file:px-4"
           />
 
           {importMessage && (
-            <p role="status" className="mt-4 text-sm text-green-800">
+            <p role="status" className="mt-4 break-words text-sm text-green-800">
               {importMessage}
             </p>
           )}
         </div>
 
-        <div className="mt-10 border-t border-[#28251F]/20 pt-8">
+        <div className="mt-8 border-t border-[#28251F]/20 pt-6 sm:mt-10 sm:pt-8">
           <label htmlFor="threshold" className="block text-sm font-medium">
             Required number of shares
           </label>
@@ -234,30 +259,49 @@ export default function RecoverPage() {
               setError("");
               setImportMessage("");
             }}
-            className="mt-3 w-full max-w-xs border border-[#28251F]/25 bg-transparent px-4 py-3 outline-none focus:border-[#702632]"
+            className="mt-3 min-h-12 w-full max-w-xs border border-[#28251F]/25 bg-transparent px-4 py-3 outline-none focus:border-[#702632]"
           />
         </div>
 
-        <div className="mt-10">
+        <div className="mt-8 sm:mt-10">
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <h2 className="font-serif text-2xl">Your shares</h2>
-            <span className="text-sm text-[#28251F]/60">
+            <span className="text-xs text-[#28251F]/60 sm:text-sm">
               {selected.length} of {shares.length} selected
             </span>
+          </div>
+
+          <div className="mb-5 flex flex-wrap gap-x-5 gap-y-3">
+            <button
+              type="button"
+              onClick={selectAllShares}
+              disabled={selected.length === shares.length}
+              className="min-h-10 text-sm text-[#702632] underline underline-offset-4 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Select all
+            </button>
+            <button
+              type="button"
+              onClick={clearSelection}
+              disabled={selected.length === 0}
+              className="min-h-10 text-sm text-[#702632] underline underline-offset-4 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Clear selection
+            </button>
           </div>
 
           <div className="space-y-3">
             {shares.map((share, index) => (
               <div
                 key={index}
-                className="flex items-center gap-3 border border-[#28251F]/15 bg-white/30 px-4 py-3"
+                className="grid min-w-0 grid-cols-[auto_auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 border border-[#28251F]/15 bg-white/30 px-3 py-3 sm:flex sm:gap-3 sm:px-4"
               >
                 <input
                   type="checkbox"
                   aria-label={`Select share ${index + 1}`}
                   checked={selected.includes(index)}
                   onChange={() => toggleShare(index)}
-                  className="h-4 w-4 accent-[#702632]"
+                  className="h-5 w-5 accent-[#702632]"
                 />
 
                 <span className="w-8 text-sm text-[#28251F]/50">
@@ -269,14 +313,14 @@ export default function RecoverPage() {
                   value={share}
                   onChange={(event) => updateShare(index, event.target.value)}
                   placeholder="Enter share as x, y"
-                  className="min-w-0 flex-1 bg-transparent px-2 py-2 outline-none focus:border-b focus:border-[#702632]"
+                  className="col-span-3 min-h-11 w-full min-w-0 border-b border-transparent bg-transparent px-1 py-2 text-sm outline-none focus:border-[#702632] sm:col-span-1 sm:flex-1 sm:px-2"
                 />
 
                 {shares.length > 2 && (
                   <button
                     type="button"
                     onClick={() => removeShare(index)}
-                    className="text-xs text-[#702632] hover:underline"
+                    className="col-span-3 min-h-10 justify-self-start px-1 text-xs text-[#702632] hover:underline sm:col-span-1"
                     aria-label={`Remove share ${index + 1}`}
                   >
                     Remove
@@ -290,7 +334,7 @@ export default function RecoverPage() {
             type="button"
             onClick={addShare}
             disabled={shares.length >= MAX_SHARES}
-            className="mt-5 text-sm underline underline-offset-4 disabled:cursor-not-allowed disabled:opacity-40"
+            className="mt-5 min-h-10 text-left text-sm underline underline-offset-4 disabled:cursor-not-allowed disabled:opacity-40"
           >
             + Add another share
           </button>
@@ -303,13 +347,13 @@ export default function RecoverPage() {
         <button
           type="button"
           onClick={recoverSecret}
-          className="mt-10 w-full bg-[#702632] px-6 py-4 text-sm font-medium text-[#F3F0E6] transition hover:bg-[#57202A] sm:w-auto"
+          className="mt-8 min-h-12 w-full bg-[#702632] px-6 py-4 text-sm font-medium text-[#F3F0E6] transition hover:bg-[#57202A] sm:mt-10 sm:w-auto"
         >
           Recover secret →
         </button>
 
         {error && (
-          <p role="alert" className="mt-5 text-sm text-[#702632]">
+          <p role="alert" className="mt-5 break-words text-sm text-[#702632]">
             {error}
           </p>
         )}
@@ -317,19 +361,21 @@ export default function RecoverPage() {
         {result !== null && (
           <div
             aria-live="polite"
-            className="mt-8 border border-[#A8B56A] bg-[#A8B56A]/15 p-6"
+            className="mt-8 border border-[#A8B56A] bg-[#A8B56A]/15 p-4 sm:p-6"
           >
             <p className="text-xs uppercase tracking-[0.2em]">
               Recovered secret
             </p>
-            <p className="mt-3 font-serif text-4xl">{result.toString()}</p>
+            <p className="mt-3 break-words font-serif text-4xl">
+              {result.toString()}
+            </p>
             <p className="mt-3 text-sm text-[#28251F]/70">
               Reconstruction completed using the selected shares.
             </p>
           </div>
         )}
 
-        <p className="mt-12 border-t border-[#28251F]/15 pt-5 text-xs leading-6 text-[#28251F]/55">
+        <p className="mt-10 border-t border-[#28251F]/15 pt-5 text-xs leading-6 text-[#28251F]/55 sm:mt-12">
           This is an educational demonstration using a small finite field.
           Do not use it to protect real secrets.
         </p>

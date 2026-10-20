@@ -57,6 +57,16 @@ export default function SplitPage() {
     }
   }
 
+  async function copyShare(share: Share) {
+    try {
+      await navigator.clipboard.writeText(
+        `${share.x.toString()},${share.y.toString()}`,
+      );
+    } catch {
+      setError("Could not copy the share. Please copy it manually.");
+    }
+  }
+
   function downloadShares() {
     if (shares.length === 0) return;
 
@@ -96,44 +106,47 @@ export default function SplitPage() {
   }).join(" ");
 
   return (
-    <main className="min-h-screen bg-[#F3F0E6] text-[#252522]">
+    <main className="min-h-screen overflow-x-hidden bg-[#F3F0E6] text-[#252522]">
       <header className="border-b border-[#252522]/20">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8">
-          <Link href="/" className="text-xl font-bold tracking-tight">
+        <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-8 sm:py-5">
+          <Link
+            href="/"
+            className="shrink-0 text-xl font-bold tracking-tight"
+          >
             secret<span className="text-[#702632]">/</span>share
           </Link>
 
-          <div className="flex gap-5 text-xs uppercase tracking-[0.16em] text-[#702632]">
-            <Link href="/" className="hover:underline">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[10px] uppercase tracking-[0.08em] text-[#702632] sm:gap-5 sm:text-xs sm:tracking-[0.16em]">
+            <Link href="/" className="py-1 hover:underline">
               Home
             </Link>
-            <Link href="/recover" className="hover:underline">
+            <Link href="/recover" className="py-1 hover:underline">
               Recover
             </Link>
-            <Link href="/learn" className="hover:underline">
+            <Link href="/learn" className="py-1 hover:underline">
               How it works
             </Link>
           </div>
         </nav>
       </header>
 
-      <section className="mx-auto max-w-5xl px-5 py-14 sm:px-8 sm:py-20">
-        <p className="text-xs uppercase tracking-[0.2em] text-[#702632]">
+      <section className="mx-auto max-w-5xl px-4 py-10 sm:px-8 sm:py-20">
+        <p className="text-[10px] uppercase tracking-[0.16em] text-[#702632] sm:text-xs sm:tracking-[0.2em]">
           Cryptography / Project 001
         </p>
 
-        <h1 className="mt-4 font-serif text-4xl sm:text-5xl">
+        <h1 className="mt-4 font-serif text-4xl tracking-tight sm:text-5xl">
           Split a secret.
         </h1>
 
-        <p className="mt-4 max-w-xl text-sm leading-7 text-[#626158]">
+        <p className="mt-4 max-w-xl text-sm leading-7 text-[#626158] sm:text-base">
           Choose a number, decide how many shares to create, and set how many
           are needed to recover it.
         </p>
 
-        <div className="mt-10 border border-[#252522]/20 bg-[#E9E5D9] p-6 sm:p-8">
-          <div className="grid gap-6 sm:grid-cols-3">
-            <label className="block text-sm">
+        <div className="mt-8 border border-[#252522]/20 bg-[#E9E5D9] p-4 sm:mt-10 sm:p-8">
+          <div className="grid gap-5 sm:grid-cols-3 sm:gap-6">
+            <label className="block min-w-0 text-sm">
               <span className="mb-2 block">Secret (0–256)</span>
               <input
                 type="number"
@@ -142,11 +155,11 @@ export default function SplitPage() {
                 step="1"
                 value={secret}
                 onChange={(event) => setSecret(event.target.value)}
-                className="w-full border border-[#252522]/30 bg-[#F3F0E6] px-3 py-3 outline-none focus:border-[#702632]"
+                className="min-h-12 w-full min-w-0 border border-[#252522]/30 bg-[#F3F0E6] px-3 py-3 outline-none focus:border-[#702632]"
               />
             </label>
 
-            <label className="block text-sm">
+            <label className="block min-w-0 text-sm">
               <span className="mb-2 block">Number of shares</span>
               <input
                 type="number"
@@ -155,11 +168,11 @@ export default function SplitPage() {
                 step="1"
                 value={shareCount}
                 onChange={(event) => setShareCount(event.target.value)}
-                className="w-full border border-[#252522]/30 bg-[#F3F0E6] px-3 py-3 outline-none focus:border-[#702632]"
+                className="min-h-12 w-full min-w-0 border border-[#252522]/30 bg-[#F3F0E6] px-3 py-3 outline-none focus:border-[#702632]"
               />
             </label>
 
-            <label className="block text-sm">
+            <label className="block min-w-0 text-sm">
               <span className="mb-2 block">Required to recover</span>
               <input
                 type="number"
@@ -168,7 +181,7 @@ export default function SplitPage() {
                 step="1"
                 value={threshold}
                 onChange={(event) => setThreshold(event.target.value)}
-                className="w-full border border-[#252522]/30 bg-[#F3F0E6] px-3 py-3 outline-none focus:border-[#702632]"
+                className="min-h-12 w-full min-w-0 border border-[#252522]/30 bg-[#F3F0E6] px-3 py-3 outline-none focus:border-[#702632]"
               />
             </label>
           </div>
@@ -176,7 +189,7 @@ export default function SplitPage() {
           <button
             type="button"
             onClick={generate}
-            className="mt-7 bg-[#702632] px-6 py-3 text-sm text-[#F3F0E6] transition hover:bg-[#54202A]"
+            className="mt-6 min-h-12 w-full bg-[#702632] px-6 py-3 text-sm text-[#F3F0E6] transition hover:bg-[#54202A] sm:mt-7 sm:w-auto"
           >
             Generate shares <span className="ml-2">↗</span>
           </button>
@@ -190,13 +203,13 @@ export default function SplitPage() {
 
         {shares.length > 0 && (
           <>
-            <section className="mt-12">
-              <div className="flex flex-wrap items-end justify-between gap-3">
+            <section className="mt-10 sm:mt-12">
+              <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-end">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.16em] text-[#702632]">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-[#702632] sm:text-xs sm:tracking-[0.16em]">
                     Polynomial visualizer
                   </p>
-                  <h2 className="mt-2 font-serif text-3xl">
+                  <h2 className="mt-2 font-serif text-2xl sm:text-3xl">
                     See how the shares connect.
                   </h2>
                 </div>
@@ -206,169 +219,168 @@ export default function SplitPage() {
                 </p>
               </div>
 
-              <div className="mt-6 border border-[#252522]/20 bg-[#E9E5D9] p-3 sm:p-6">
-                <div className="mb-4 flex flex-wrap gap-x-5 gap-y-2 text-xs text-[#626158]">
+              <div className="mt-6 min-w-0 border border-[#252522]/20 bg-[#E9E5D9] p-2 sm:p-6">
+                <div className="mb-4 flex flex-wrap gap-x-4 gap-y-2 text-[10px] text-[#626158] sm:gap-x-5 sm:text-xs">
                   <span className="flex items-center gap-2">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#702632]" />
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#702632]" />
                     Secret at x = 0
                   </span>
                   <span className="flex items-center gap-2">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#788B45]" />
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#788B45]" />
                     Generated shares
                   </span>
                   <span className="flex items-center gap-2">
-                    <span className="h-0.5 w-5 bg-[#702632]" />
+                    <span className="h-0.5 w-5 shrink-0 bg-[#702632]" />
                     Polynomial values
                   </span>
                 </div>
 
-                <svg
-                  viewBox="0 0 720 320"
-                  role="img"
-                  aria-label="Polynomial values and generated share points in the finite field"
-                  className="w-full"
-                >
-                  {[0, 64, 128, 192, 256].map((value) => {
-                    const y = chart.bottom - (value / 256) * chart.height;
-
-                    return (
-                      <g key={value}>
-                        <line
-                          x1={chart.left}
-                          y1={y}
-                          x2={chart.right}
-                          y2={y}
-                          stroke="#252522"
-                          strokeOpacity="0.12"
-                          strokeDasharray="4 5"
-                        />
-                        <text
-                          x={chart.left - 10}
-                          y={y + 4}
-                          textAnchor="end"
-                          fill="#626158"
-                          fontSize="11"
-                        >
-                          {value}
-                        </text>
-                      </g>
-                    );
-                  })}
-
-                  {Array.from({ length: shares.length + 1 }, (_, x) => {
-                    const plotX = chart.left + (x / maxX) * chart.width;
-
-                    return (
-                      <g key={x}>
-                        <line
-                          x1={plotX}
-                          y1={chart.top}
-                          x2={plotX}
-                          y2={chart.bottom}
-                          stroke="#252522"
-                          strokeOpacity="0.08"
-                        />
-                        <text
-                          x={plotX}
-                          y={chart.bottom + 20}
-                          textAnchor="middle"
-                          fill="#626158"
-                          fontSize="11"
-                        >
-                          {x}
-                        </text>
-                      </g>
-                    );
-                  })}
-
-                  <line
-                    x1={chart.left}
-                    y1={chart.top}
-                    x2={chart.left}
-                    y2={chart.bottom}
-                    stroke="#252522"
-                    strokeOpacity="0.5"
-                  />
-                  <line
-                    x1={chart.left}
-                    y1={chart.bottom}
-                    x2={chart.right}
-                    y2={chart.bottom}
-                    stroke="#252522"
-                    strokeOpacity="0.5"
-                  />
-
-                  <polyline
-                    points={curve}
-                    fill="none"
-                    stroke="#702632"
-                    strokeWidth="2.5"
-                    strokeLinejoin="round"
-                  />
-
-                  {shares.map((share) => {
-                    const x =
-                      chart.left +
-                      (Number(share.x) / maxX) * chart.width;
-                    const y =
-                      chart.bottom -
-                      (Number(share.y) / 256) * chart.height;
-
-                    return (
-                      <g key={share.x.toString()}>
-                        <circle
-                          cx={x}
-                          cy={y}
-                          r="5"
-                          fill="#788B45"
-                          stroke="#F3F0E6"
-                          strokeWidth="2"
-                        />
-                        <title>
-                          Share ({share.x.toString()}, {share.y.toString()})
-                        </title>
-                      </g>
-                    );
-                  })}
-
-                  <circle
-                    cx={chart.left}
-                    cy={
-                      chart.bottom -
-                      (Number(shares.length > 0 ? coefficients[0] : 0n) /
-                        256) *
-                        chart.height
-                    }
-                    r="6"
-                    fill="#702632"
-                    stroke="#F3F0E6"
-                    strokeWidth="2"
-                  />
-
-                  <text
-                    x={chart.left + 10}
-                    y={
-                      chart.bottom -
-                      (Number(coefficients[0]) / 256) * chart.height -
-                      12
-                    }
-                    fill="#702632"
-                    fontSize="12"
-                    fontWeight="600"
+                <div className="w-full min-w-0 overflow-hidden">
+                  <svg
+                    viewBox="0 0 720 320"
+                    role="img"
+                    aria-label="Polynomial values and generated share points in the finite field"
+                    className="block h-auto w-full"
                   >
-                    Secret: {coefficients[0].toString()}
-                  </text>
+                    {[0, 64, 128, 192, 256].map((value) => {
+                      const y = chart.bottom - (value / 256) * chart.height;
 
-                  <text
-                    x="360"
-                    y="312"
-                    textAnchor="middle"
-                    fill="#626158"
-                    fontSize="12"
-                  >
-                    Share coordinate x
-                  </text>
-                </svg>
+                      return (
+                        <g key={value}>
+                          <line
+                            x1={chart.left}
+                            y1={y}
+                            x2={chart.right}
+                            y2={y}
+                            stroke="#252522"
+                            strokeOpacity="0.12"
+                            strokeDasharray="4 5"
+                          />
+                          <text
+                            x={chart.left - 10}
+                            y={y + 4}
+                            textAnchor="end"
+                            fill="#626158"
+                            fontSize="11"
+                          >
+                            {value}
+                          </text>
+                        </g>
+                      );
+                    })}
+
+                    {Array.from({ length: shares.length + 1 }, (_, x) => {
+                      const plotX = chart.left + (x / maxX) * chart.width;
+
+                      return (
+                        <g key={x}>
+                          <line
+                            x1={plotX}
+                            y1={chart.top}
+                            x2={plotX}
+                            y2={chart.bottom}
+                            stroke="#252522"
+                            strokeOpacity="0.08"
+                          />
+                          <text
+                            x={plotX}
+                            y={chart.bottom + 20}
+                            textAnchor="middle"
+                            fill="#626158"
+                            fontSize="11"
+                          >
+                            {x}
+                          </text>
+                        </g>
+                      );
+                    })}
+
+                    <line
+                      x1={chart.left}
+                      y1={chart.top}
+                      x2={chart.left}
+                      y2={chart.bottom}
+                      stroke="#252522"
+                      strokeOpacity="0.5"
+                    />
+                    <line
+                      x1={chart.left}
+                      y1={chart.bottom}
+                      x2={chart.right}
+                      y2={chart.bottom}
+                      stroke="#252522"
+                      strokeOpacity="0.5"
+                    />
+
+                    <polyline
+                      points={curve}
+                      fill="none"
+                      stroke="#702632"
+                      strokeWidth="2.5"
+                      strokeLinejoin="round"
+                    />
+
+                    {shares.map((share) => {
+                      const x =
+                        chart.left + (Number(share.x) / maxX) * chart.width;
+                      const y =
+                        chart.bottom -
+                        (Number(share.y) / 256) * chart.height;
+
+                      return (
+                        <g key={share.x.toString()}>
+                          <circle
+                            cx={x}
+                            cy={y}
+                            r="5"
+                            fill="#788B45"
+                            stroke="#F3F0E6"
+                            strokeWidth="2"
+                          />
+                          <title>
+                            Share ({share.x.toString()}, {share.y.toString()})
+                          </title>
+                        </g>
+                      );
+                    })}
+
+                    <circle
+                      cx={chart.left}
+                      cy={
+                        chart.bottom -
+                        (Number(coefficients[0]) / 256) * chart.height
+                      }
+                      r="6"
+                      fill="#702632"
+                      stroke="#F3F0E6"
+                      strokeWidth="2"
+                    />
+
+                    <text
+                      x={chart.left + 10}
+                      y={
+                        chart.bottom -
+                        (Number(coefficients[0]) / 256) * chart.height -
+                        12
+                      }
+                      fill="#702632"
+                      fontSize="12"
+                      fontWeight="600"
+                    >
+                      Secret: {coefficients[0].toString()}
+                    </text>
+
+                    <text
+                      x="360"
+                      y="312"
+                      textAnchor="middle"
+                      fill="#626158"
+                      fontSize="12"
+                    >
+                      Share coordinate x
+                    </text>
+                  </svg>
+                </div>
 
                 <p className="mt-3 text-xs leading-6 text-[#626158]">
                   The plotted values are calculated modulo 257. Connecting
@@ -377,7 +389,7 @@ export default function SplitPage() {
                 </p>
               </div>
 
-              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className="border border-[#252522]/20 p-4">
                   <p className="text-xs text-[#626158]">Original secret</p>
                   <p className="mt-2 font-serif text-2xl">
@@ -404,10 +416,10 @@ export default function SplitPage() {
               </p>
             </section>
 
-            <section className="mt-14">
-              <div className="flex flex-wrap items-end justify-between gap-3">
+            <section className="mt-12 sm:mt-14">
+              <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-end">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.16em] text-[#702632]">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-[#702632] sm:text-xs sm:tracking-[0.16em]">
                     Generated shares
                   </p>
                   <h2 className="mt-2 font-serif text-2xl">
@@ -423,24 +435,20 @@ export default function SplitPage() {
                 {shares.map((share) => (
                   <div
                     key={share.x.toString()}
-                    className="flex flex-wrap items-center justify-between gap-4 bg-[#E9E5D9] px-5 py-4"
+                    className="flex flex-wrap items-center justify-between gap-3 bg-[#E9E5D9] px-3 py-4 sm:gap-4 sm:px-5"
                   >
                     <span className="text-sm font-medium">
                       Share {share.x.toString()}
                     </span>
 
-                    <code className="text-sm">
+                    <code className="max-w-full break-all text-sm">
                       ({share.x.toString()}, {share.y.toString()})
                     </code>
 
                     <button
                       type="button"
-                      onClick={() =>
-                        void navigator.clipboard.writeText(
-                          `${share.x.toString()},${share.y.toString()}`,
-                        )
-                      }
-                      className="text-xs text-[#702632] hover:underline"
+                      onClick={() => void copyShare(share)}
+                      className="min-h-10 px-2 text-sm text-[#702632] hover:underline"
                     >
                       Copy
                     </button>
@@ -451,7 +459,7 @@ export default function SplitPage() {
               <button
                 type="button"
                 onClick={downloadShares}
-                className="mt-6 border border-[#702632] px-6 py-3 text-sm text-[#702632] transition hover:bg-[#702632] hover:text-[#F3F0E6]"
+                className="mt-6 min-h-12 w-full border border-[#702632] px-6 py-3 text-sm text-[#702632] transition hover:bg-[#702632] hover:text-[#F3F0E6] sm:w-auto"
               >
                 Download shares (.txt) ↓
               </button>
