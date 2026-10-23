@@ -1,7 +1,15 @@
 
 # Secret Share
 
-Secret Share is an interactive educational web app demonstrating **Shamir's Secret Sharing**. Split a numeric secret into multiple shares and reconstruct it using a required threshold of shares.
+Secret Share is a cryptography web application that demonstrates Shamir's Secret Sharing over the finite field GF(257). It allows users to split a numeric secret into multiple shares and reconstruct the original secret using a specified threshold of shares.
+
+![Screenshot 1](1.png)
+
+![Screenshot 2](2.png)
+
+##  Live Demo
+
+🔗 Live Demo: https://secretshare-demo.vercel.app
 
 ## Features
 
